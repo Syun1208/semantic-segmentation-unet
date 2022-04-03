@@ -95,7 +95,7 @@ def main():
     )
 
     if LOAD_MODEL:
-        load_checkpoint(torch.load("/content/gdrive/MyDrive/my_checkpoint.pth"), model, optimizer)
+        load_checkpoint(torch.load("/content/gdrive/MyDrive/Colab Notebooks/my_checkpoint.pth"), model, optimizer)
 
 
     check_accuracy(val_loader, model, device=DEVICE)
