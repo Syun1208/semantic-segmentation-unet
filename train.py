@@ -4,6 +4,8 @@ from albumentations.pytorch import ToTensorV2
 from tqdm import tqdm
 import torch.nn as nn
 import torch.optim as optim
+import matplotlib.pyplot as plt
+from IPython.display import clear_output
 from model import UNET
 from utils import (
     load_checkpoint,
@@ -12,12 +14,13 @@ from utils import (
     check_accuracy,
     save_predictions_as_imgs,
 )
+from tabulate import tabulate
 
 # Hyperparameters etc.
 LEARNING_RATE = 1e-4
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 10
-NUM_EPOCHS = 10
+NUM_EPOCHS = 100
 NUM_WORKERS = 2
 IMAGE_HEIGHT = 80  # 1280 originally
 IMAGE_WIDTH = 160  # 1918 originally
@@ -94,17 +97,24 @@ def main():
         PIN_MEMORY,
     )
 
-    if LOAD_MODEL:
-        load_checkpoint(torch.load("/content/gdrive/MyDrive/Colab Notebooks/my_checkpoint.pth"), model, optimizer)
+    # if LOAD_MODEL:
+    #     load_checkpoint(torch.load("/content/gdrive/MyDrive/Colab Notebooks/my_checkpoint.pth"), model, optimizer)
 
 
     check_accuracy(val_loader, model, device=DEVICE)
     scaler = torch.cuda.amp.GradScaler()
 
     for epoch in range(NUM_EPOCHS):
-        print(f"Epoch {epoch+1}: ")
-        train_fn(train_loader, model, optimizer, loss_fn, scaler)
-
+        clear_output(wait=True)
+        # print(f"Epoch {epoch+1}/{NUM_EPOCHS}: ")
+        num_correct, num_pixels, dice_score = train_fn(train_loader, model, optimizer, loss_fn, scaler)
+        dice_score_result = dice_score/len(train_loader)
+        accuracy = num_correct/num_pixels*100
+        tables = ['Epoch', 'Accuracy', 'Dice score']
+        headers = [['{epoch+1}/{NUM_EPOCHS}', '{accuracy:.2f}', '{dice_score_result}']]
+        print(tabulate(headers, tables, tablefmt="psql"))
+        # print(f"Got {num_correct}/{num_pixels} with acc {accuracy:.2f}")
+        # print(f"Dice score: {dice_score_result}")
         # save model
         checkpoint = {
             "state_dict": model.state_dict(),
@@ -119,7 +129,15 @@ def main():
         save_predictions_as_imgs(
             val_loader, model, folder="/content/saved_images", device=DEVICE
         )
-
+        #plot results
+        plt.figure(figsize=(10,8))
+        plt.title("Results for UNET segmentation")
+        plt.plot(epoch, dice_score_result, '-g')
+        plt.plot(epoch, accuracy, 'b')
+        plt.xlabel("Epoch")
+        plt.ylabel("Accuracy and Dice Score")
+        plt.legend(['Dice score', 'Accuracy'])
+        plt.show()
 
 if __name__ == "__main__":
     main()
