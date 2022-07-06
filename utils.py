@@ -3,7 +3,7 @@ import torchvision
 from dataset import CarvanaDataset
 from torch.utils.data import DataLoader
 
-def save_checkpoint(state, filename="/content/gdrive/MyDrive/Colab Notebooks/my_checkpoint.pth"):
+def save_checkpoint(state, filename="/content/gdrive/MyDrive/Colab_Notebooks/my_checkpoint.pth"):
     print("=> Saving checkpoint")
     torch.save(state, filename)
 
