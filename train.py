@@ -26,10 +26,10 @@ IMAGE_HEIGHT = 80  # 1280 originally
 IMAGE_WIDTH = 160  # 1918 originally
 PIN_MEMORY = True
 LOAD_MODEL = True
-TRAIN_IMG_DIR = "/content/data_v2/data_v2/train"
-TRAIN_MASK_DIR = "/content/data_v2/data_v2/trainanot"
-VAL_IMG_DIR = "/content/data_v2/data_v2/val"
-VAL_MASK_DIR = "/content/data_v2/data_v2/valanot"
+TRAIN_IMG_DIR = "/content/data_v2/train"
+TRAIN_MASK_DIR = "/content/data_v2/trainanot"
+VAL_IMG_DIR = "/content/data_v2/val"
+VAL_MASK_DIR = "/content/data_v2/valanot"
 
 def train_fn(loader, model, optimizer, loss_fn, scaler):
     loop = tqdm(loader)
